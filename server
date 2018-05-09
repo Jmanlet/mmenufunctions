@@ -1,0 +1,98 @@
+RegisterServerEvent("cuffNear")
+AddEventHandler("cuffNear", function(id)
+
+	print("cuffing "..id)
+	TriggerClientEvent("cuff1", id)
+
+end)
+
+RegisterServerEvent("chatMessage")
+AddEventHandler('chatMessage', function(source, n, message)
+    cm = stringsplit(message, " ")
+
+    if cm[1] == "/cuff" then
+      CancelEvent()
+    if (cm[2] ~= nil) then
+      local tPID = tonumber(cm[2])
+      TriggerClientEvent("cuff1", tPID)
+	elseif (cm[2] == nil) then
+	  TriggerClientEvent("nocuff", source)
+    end
+  end
+end)
+
+RegisterServerEvent("chatMessage")
+
+AddEventHandler('chatMessage', function(source, n, message)
+    dm = stringsplit(message, " ")
+
+    if dm[1] == "/grab" then
+      CancelEvent()
+	  
+		if ((tablelength(dm) > 1) and (dm[2] ~= nil)) then
+			local tPID = tonumber(dm[2])
+			TriggerClientEvent("grab", tPID, source)
+		elseif dm[2] == nil then
+			TriggerClientEvent("grabNear",  source)
+	 end
+	 end
+end)
+	  
+	 RegisterServerEvent("grabNear")
+
+	AddEventHandler('grabNear', function(id)	
+	
+		TriggerClientEvent("grab", id, source)
+	end)
+	
+AddEventHandler('chatMessage', function(source, n, msg)
+    local args = stringsplit(msg, ' ')
+        
+    if string.lower(args[1]) == "/emotes" then
+        TriggerClientEvent("emote:display", source)
+        CancelEvent()
+    elseif string.lower(args[1]) == "/emote" then
+        if args[2] ~= nil then
+            TriggerClientEvent("emote:invoke", source, args[2])
+        else
+            TriggerClientEvent("chatMessage", source, "^1Emotes | Error", {255,0,0}, "^7Use \"^3/emotes^7\" to display all of the emotes")
+        end
+        CancelEvent()
+    elseif string.lower(args[1]) == "/cancelemote" then
+        TriggerClientEvent("emote:cancelnow", source)
+        CancelEvent()
+    end
+end)
+
+RegisterServerEvent('Cuff_close:getCuffServer')
+AddEventHandler('Cuff_close:getCuffServer', function(t)
+    TriggerClientEvent('Cuff_close:getArrested', t)
+end)
+
+RegisterServerEvent('Cuff_close:getUnseatServer')
+AddEventHandler('Cuff_close:getUnseatServer', function(t, v)
+    TriggerClientEvent('Cuff_close:unseatme', t, v)
+end)
+
+RegisterServerEvent('Cuff_close:getSeatedServer')
+AddEventHandler('Cuff_close:getSeatedServer', function(t)
+    TriggerClientEvent('Cuff_close:forcedEnteringVeh', t)
+end)
+
+function stringsplit(inputstr, sep)
+    if sep == nil then
+        sep = "%s"
+    end
+    local t={} ; i=1
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+        t[i] = str
+        i = i + 1
+    end
+    return t
+end
+
+function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
